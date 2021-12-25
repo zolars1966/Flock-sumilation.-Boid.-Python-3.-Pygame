@@ -1,0 +1,1 @@
+This version in very slow, but very understandable. Was made to study the algorithm.
