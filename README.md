@@ -30,10 +30,16 @@ def length2D(vec):
 Python realization
 ``` Python
 def run(self, boids):
-        self.pos = self.x, self.y = (self.x + self.velocity[0]) % 1280, (self.y + self.velocity[1]) % 720
+        self.pos = self.x, self.y = (self.x + self.velocity[0]) % self.width, (self.y + self.velocity[1]) % self.height
 
         self.velocity[0] += self.acceleration[0]
         self.velocity[1] += self.acceleration[1]
+
+        angle = math.acos(self.velocity[0] / length2D(self.velocity))
+        angle += randint(-1, 1) / (2 * math.pi) / 5
+
+        self.velocity[0] = math.cos(angle)
+        self.velocity[1] = math.sin(angle)
 
         if length2D(self.velocity) > self.max_speed:
             self.velocity[0] = self.velocity[0] / length2D(self.velocity) * self.max_speed
