@@ -7,27 +7,23 @@ def length2D(vec):
 
 
 class Boid:
-    def __init__(self, x, y, radius, width, height):
+    def __init__(self, x, y, radius, width, height, i):
         self.size = self.width, self.height = width, height
         self.pos = self.x, self.y = x, y
-        self.velocity = [(random()-0.5) * radius / 2.5, (random()-0.5) * radius / 2.5]
+        self.velocity = [(random()-0.5) * radius / 4, (random()-0.5) * radius / 4]
         self.acceleration = [0, 0]
         
-        self.max_speed = radius / 5
-        self.max_force = 0.1
-        self.perception = radius * 3
+        self.max_speed = radius / 8
+        self.max_force = radius / 20
+        self.perception = radius * 12
 
-    def run(self, boids):
+        self.index = i
+
+    def run(self):
         self.pos = self.x, self.y = (self.x + self.velocity[0]) % self.width, (self.y + self.velocity[1]) % self.height
 
         self.velocity[0] += self.acceleration[0]
         self.velocity[1] += self.acceleration[1]
-
-        angle = math.acos(self.velocity[0] / length2D(self.velocity))
-        angle += randint(-1, 1) / (2 * math.pi) / 5
-
-        self.velocity[0] = math.cos(angle)
-        self.velocity[1] = math.sin(angle)
 
         if length2D(self.velocity) > self.max_speed:
             self.velocity[0] = self.velocity[0] / length2D(self.velocity) * self.max_speed
@@ -53,9 +49,9 @@ class Boid:
         total1 = 0
         avg_vector1 = [0, 0]
 
-        for boid in boids:
+        for i, boid in enumerate(boids):
             distance = min(abs(length2D([boid.x - self.x, boid.y - self.y])), abs(length2D([self.width - boid.x + self.x, self.height - boid.y + self.y])))
-            if distance < self.perception:
+            if distance <= self.perception:
                 avg_vec[0] += boid.velocity[0]
                 avg_vec[1] += boid.velocity[1]
                 
@@ -63,7 +59,7 @@ class Boid:
                 center_of_mass[1] += boid.y
                 total += 1
 
-            if self.pos != boid.pos and distance < self.perception:
+            if i != self.index and distance <= self.perception:
                 diff = [self.x - boid.x, self.y - boid.y]
                 diff[0] /= distance
                 diff[1] /= distance
@@ -100,7 +96,8 @@ class Boid:
                 avg_vector1 = avg_vector1[0] / ls * self.max_speed, avg_vector1[1] / ls * self.max_speed
             
             steering3 = [avg_vector1[0] - self.velocity[0], avg_vector1[1] - self.velocity[1]]
-            if ls > self.max_force / 5:
-                steering3 = steering3[0] / ls * self.max_force, steering3[1] / ls * self.max_force / 5
+            ls = length2D(steering3)
+            if ls > self.max_force / 1.025:
+                steering3 = steering3[0] / ls * self.max_force / 1.025, steering3[1] / ls * self.max_force / 1.025
 
         return steering1, steering2, steering3

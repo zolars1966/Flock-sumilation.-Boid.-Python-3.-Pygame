@@ -4,11 +4,11 @@ import pygame as pg
 import math
 import sys
 
-TICK_RATE = 128
+TICK_RATE = 32
 FPS = 32
-size = width, height = 128*2, 72*2
-radius = 5
-num = 32
+radius = 4
+num = 50
+size = width, height = 720, 720
 
 
 def length2D(vec):
@@ -18,9 +18,9 @@ def length2D(vec):
 def draw_boids(sc, boids):
     for boid in boids:
         pg.draw.circle(sc, "black", boid.pos, radius)
+        # pg.draw.circle(sc, "yellow", boid.pos, boid.perception/2, 1)
         lv = length2D(boid.velocity)
-        # xpos = boid.pos + boid.velocity / lv * 10
-        xpos = boid.pos[0] + radius*2*boid.velocity[0]/lv, boid.pos[1] + radius*2*boid.velocity[1]/lv
+        xpos = boid.pos[0] - radius*2*boid.velocity[0]/lv, boid.pos[1] - radius*2*boid.velocity[1]/lv
         pg.draw.line(sc, "black", boid.pos, xpos, int(radius/2.5))
 
 
