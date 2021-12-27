@@ -25,6 +25,42 @@ def length2D(vec):
     return math.sqrt(vec[0]*vec[0] + vec[1]*vec[1])
 ```
 
+## Class Flock
+
+Method ```run``` calls in main cycle in ```main``` file.
+
+Python realization
+``` Python
+class Flock:
+    def __init__(self, b_num, radius, width, height):
+        self.boids = [Boid(randint(0, width-1), randint(0, height-1), radius, width, height, i) for i in range(b_num)]
+
+    def run(self):
+        for boid in self.boids:
+            boid.run()
+            boid.apply_behaviour(self.boids)
+```
+
+## Class Boid
+
+Parameter ```i```, means Boid index in ```boids``` list.
+
+Python realization
+``` Python
+class Boid:
+    def __init__(self, x, y, radius, width, height, i):
+        self.size = self.width, self.height = width, height
+        self.pos = self.x, self.y = x, y
+        self.velocity = [(random()-0.5) * radius / 4, (random()-0.5) * radius / 4]
+        self.acceleration = [0, 0]
+        
+        self.max_speed = radius / 8
+        self.max_force = radius / 20
+        self.perception = radius * 12
+
+        self.index = i
+```
+
 ## Boid movement
 
 Python realization
@@ -49,6 +85,19 @@ def run(self, boids):
 
 ![https://www.researchgate.net/profile/Noury-Bouraqadi/publication/228771083/figure/fig4/AS:668681436688392@1536437486279/Flocking-Relies-on-3-Rules-for-Steering-Individual-Boids.png](https://www.researchgate.net/profile/Noury-Bouraqadi/publication/228771083/figure/fig4/AS:668681436688392@1536437486279/Flocking-Relies-on-3-Rules-for-Steering-Individual-Boids.png "Visualization")
 
+### Apply rules to Boid
+
+Python realization
+``` Python
+def apply_behaviour(self, boids):
+        alignment = self.align(boids)
+        cohesion = self.cohesion(boids)
+        separation = self.separation(boids)
+        
+        self.acceleration[0] += alignment[0] + cohesion[0] + separation[0]
+        self.acceleration[1] += alignment[1] + cohesion[1] + separation[1]
+```
+
 ### Separation
 
 Each boid also tries to avoid running into the other boids. If it gets too close to another boid it will steer away from it.
@@ -60,9 +109,9 @@ def separation(self, boids):
         total = 0
         avg_vector = [0, 0]
 
-        for boid in boids:
+        for i, boid in enumerate(boids):
             distance = min(abs(length2D([boid.x - self.x, boid.y - self.y])), abs(length2D([1280 - boid.x + self.x, 720 - boid.y + self.y])))
-            if self.pos != boid.pos and distance < self.perception:
+            if i != self.index and distance < self.perception:
                 diff = [self.x - boid.x, self.y - boid.y]
                 diff[0] /= distance
                 diff[1] /= distance
@@ -146,17 +195,4 @@ def align(self, boids):
             steering = avg_vec[0] - self.velocity[0], avg_vec[1] - self.velocity[1]
 
         return steering
-```
-
-### Apply rules to Boid
-
-Python realization
-``` Python
-def apply_behaviour(self, boids):
-        alignment = self.align(boids)
-        cohesion = self.cohesion(boids)
-        separation = self.separation(boids)
-        
-        self.acceleration[0] += alignment[0] + cohesion[0] + separation[0]
-        self.acceleration[1] += alignment[1] + cohesion[1] + separation[1]
 ```
